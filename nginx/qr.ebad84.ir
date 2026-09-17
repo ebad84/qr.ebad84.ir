@@ -1,0 +1,12 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name qr.ebad84.ir;
+
+    root /var/www/qr.ebad84.ir;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
