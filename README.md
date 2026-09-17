@@ -36,7 +36,7 @@ nginx             — served from my old PC at home
 ## // SELF-HOSTED
 
 This runs on an old PC I turned into a home server.  
-Not a cloud VPS. Not a managed host. Just old hardware, a static IP, and nginx.
+Not a cloud VPS. Not a managed host. Just old hardware, a public IP, and nginx.
 
 ![homelab](homelab.png)
 
@@ -61,7 +61,7 @@ cd /var/www/qr.ebad84.ir && git pull
 
 ## // LICENSE
 
-do whatever you want with it.
+This project is published under MIT license . Boil it, mix it, Do whatever you want
 
 ---
 
