@@ -22,6 +22,23 @@ Output: `PNG` `SVG`
 
 ---
 
+## // EXPORT STYLE
+
+- Every output is a white card with a subtle border and genuinely transparent,
+  rounded outer corners (not just a CSS preview effect).
+- **SHOW SITE ADDRESS** is enabled by default. Turn it off to remove the
+  `qr.ebad84.ir` footer; the frame and rounded corners remain.
+- Preview, PNG download, SVG download, clipboard, and print share the same card.
+- **WIDTH (px)** sets the output width. The optional footer adds height;
+  the status panel displays the actual exported dimensions.
+- Margin is applied in QR modules, with a minimum four-module quiet zone for
+  scanning. QR modules and finder patterns are never rounded or cropped.
+- SVG is generated directly from the encoded QR matrix, not sampled pixels.
+- The bundled encoder uses UTF-8 bytes for mixed Persian/English text and emoji.
+  All generation still stays local, with no external fonts or services.
+
+---
+
 ## // STACK
 
 ```
