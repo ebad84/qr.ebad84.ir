@@ -231,7 +231,7 @@ body {
 }
 .qr-frame {
   width: 100%;
-  max-width: 320px;
+  max-width: 480px;
   display: inline-block;
 }
 #qr-canvas-wrap {
@@ -522,7 +522,7 @@ a:hover { border-bottom-color: var(--ink); }
         <input type="checkbox" id="qr-branding" checked aria-describedby="qr-branding-hint">
         <span>
           <span class="brand-option-title">SHOW SITE ADDRESS</span>
-          <span class="brand-option-hint" id="qr-branding-hint">qr.ebad84.ir below the code</span>
+          <span class="brand-option-hint" id="qr-branding-hint">qr.ebad84.ir🍵💻 below the code</span>
         </span>
       </label>
 
@@ -703,6 +703,9 @@ let qrGenerated = false;
 
 const ECL_MAP = { L: QRCode.CorrectLevel.L, M: QRCode.CorrectLevel.M, Q: QRCode.CorrectLevel.Q, H: QRCode.CorrectLevel.H };
 const CARD = { background: '#ffffff', border: '#c3c8cf', footer: '#f3f4f6', text: '#363d46' };
+const CARD_LABEL = 'qr.ebad84.ir\u{1F375}\u{1F4BB}';
+const CARD_FONT = "Arial, 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif";
+const CANVAS_SCALE = 2; // Export PNGs at 2x for crisp modules, text and emoji.
 
 // All destinations use the same module matrix and card geometry. Only the
 // outside card corners are transparent; QR modules and the quiet zone stay intact.
@@ -711,7 +714,7 @@ function createCardLayout(model, size, margin, branded) {
   const inset = Math.max(3, Math.round(size * 0.02));
   const quiet = Math.max(4, margin);
   const unit = (size - inset * 2) / (count + quiet * 2);
-  const footerHeight = branded ? Math.max(30, Math.round(size * 0.18)) : 0;
+  const footerHeight = branded ? Math.max(36, Math.round(size * 0.2)) : 0;
   const rects = [];
   for (let row = 0; row < count; row++) {
     for (let col = 0; col < count; col++) {
@@ -726,8 +729,8 @@ function createCardLayout(model, size, margin, branded) {
   }
   return { width: size, height: size + footerHeight, size, footerHeight, branded,
     radius: Math.round(size * 0.075), stroke: Math.max(1, size / 256),
-    fontSize: Math.max(10, Math.round(size * 0.052)),
-    textY: size + footerHeight * 0.62, inset, rects };
+    fontSize: Math.max(13, Math.round(size * 0.062)),
+    textY: size + footerHeight / 2, inset, rects };
 }
 
 function roundedRect(ctx, x, y, width, height, radius) {
@@ -742,12 +745,13 @@ function roundedRect(ctx, x, y, width, height, radius) {
 
 function drawCard(layout) {
   const canvas = document.createElement('canvas');
-  canvas.width = layout.width;
-  canvas.height = layout.height;
+  canvas.width = layout.width * CANVAS_SCALE;
+  canvas.height = layout.height * CANVAS_SCALE;
   canvas.setAttribute('role', 'img');
   canvas.setAttribute('aria-label', layout.branded
-    ? 'QR code in a rounded frame with qr.ebad84.ir below' : 'QR code in a rounded frame');
+    ? `QR code in a rounded frame with ${CARD_LABEL} below` : 'QR code in a rounded frame');
   const ctx = canvas.getContext('2d');
+  ctx.scale(CANVAS_SCALE, CANVAS_SCALE);
   ctx.save();
   roundedRect(ctx, 0, 0, layout.width, layout.height, layout.radius);
   ctx.clip();
@@ -761,9 +765,10 @@ function drawCard(layout) {
     ctx.fillStyle = CARD.border;
     ctx.fillRect(0, layout.size, layout.width, layout.stroke);
     ctx.fillStyle = CARD.text;
-    ctx.font = `600 ${layout.fontSize}px Arial, sans-serif`;
+    ctx.font = `600 ${layout.fontSize}px ${CARD_FONT}`;
     ctx.textAlign = 'center';
-    ctx.fillText('qr.ebad84.ir', layout.width / 2, layout.textY);
+    ctx.textBaseline = 'middle';
+    ctx.fillText(CARD_LABEL, layout.width / 2, layout.textY);
   }
   ctx.restore();
   const half = layout.stroke / 2;
@@ -779,7 +784,7 @@ function buildSVG(layout) {
   const { width, height, size, radius, stroke, branded, footerHeight, fontSize, textY } = layout;
   const path = layout.rects.map(r =>
     `M${r.x} ${r.y}h${r.width}v${r.height}h-${r.width}z`).join('');
-  const footer = branded ? `<rect y="${size}" width="${width}" height="${footerHeight}" fill="${CARD.footer}"/><rect y="${size}" width="${width}" height="${stroke}" fill="${CARD.border}"/><text x="${width / 2}" y="${textY}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fontSize}" font-weight="600" fill="${CARD.text}">qr.ebad84.ir</text>` : '';
+  const footer = branded ? `<rect y="${size}" width="${width}" height="${footerHeight}" fill="${CARD.footer}"/><rect y="${size}" width="${width}" height="${stroke}" fill="${CARD.border}"/><text x="${width / 2}" y="${textY}" text-anchor="middle" dominant-baseline="central" font-family="Arial, 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif" font-size="${fontSize}" font-weight="600" fill="${CARD.text}">${CARD_LABEL}</text>` : '';
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="QR code"><defs><clipPath id="card"><rect width="${width}" height="${height}" rx="${radius}"/></clipPath></defs><g clip-path="url(#card)"><rect width="${width}" height="${height}" fill="${CARD.background}"/><path d="${path}" fill="#000" shape-rendering="crispEdges"/>${footer}</g><rect x="${stroke / 2}" y="${stroke / 2}" width="${width - stroke}" height="${height - stroke}" rx="${radius - stroke / 2}" fill="none" stroke="${CARD.border}" stroke-width="${stroke}"/></svg>`;
 }
 
@@ -825,7 +830,8 @@ function generateQR() {
     lastSVGData = buildSVG(layout);
     qrGenerated = true;
     document.getElementById('st-status').textContent = 'READY';
-    document.getElementById('st-size').textContent = `${layout.width}×${layout.height}`;
+    document.getElementById('st-size').textContent =
+      `${layout.width * CANVAS_SCALE}×${layout.height * CANVAS_SCALE}`;
   } catch (e) {
     showPlaceholder('COULD NOT GENERATE QR. TRY SHORTER CONTENT.');
     document.getElementById('st-status').textContent = 'ERROR';
