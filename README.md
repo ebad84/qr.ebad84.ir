@@ -50,8 +50,9 @@ nginx             — served from my old PC at home
 
 ---
 
-## // SELF-HOSTED
+## // NOT ANYMORE SELF-HOSTED
 
+(I had this project on my old computer, but poor internet quality led me to switch entirely to ArvanCloud Static Website..)
 This runs on an old PC I turned into a home server.  
 Not a cloud VPS. Not a managed host. Just old hardware, a public IP, and nginx.
 
